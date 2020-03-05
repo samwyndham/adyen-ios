@@ -5,6 +5,7 @@
 //
 
 import Foundation
+import WebKit
 
 /// Used for requests made to the CheckoutShopper API.
 internal class PaymentServer {
@@ -29,9 +30,11 @@ internal class PaymentServer {
         
         DispatchQueue.main.async {
             // Web view can only be created on main thread. Otherwise app crashes.
-            let webView = UIWebView()
-            safariUserAgent = webView.stringByEvaluatingJavaScript(from: "navigator.userAgent")
-            semaphore.signal()
+            let webView = WKWebView()
+            webView.evaluateJavaScript("navigator.userAgent") { string, error in
+                safariUserAgent = string as? String
+                semaphore.signal()
+            }
         }
         
         semaphore.wait()
